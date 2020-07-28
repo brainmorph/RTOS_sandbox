@@ -128,8 +128,13 @@ void StartBlinkTestTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-    osDelay(1);
+    HAL_GPIO_TogglePin(BLINK_LED_GPIO_Port, BLINK_LED_Pin);
+    osDelay(500);
   }
+
+  // This should never be reached but just in case
+  osThreadTerminate(NULL);
+
   /* USER CODE END StartBlinkTestTask */
 }
 
