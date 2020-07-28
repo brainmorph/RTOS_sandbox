@@ -18,10 +18,19 @@ void setup() {
   mySerial.println("Hello, world?");
 }
 
+unsigned int counter = 0;
 void loop() {
   // put your main code here, to run repeatedly:
-  if (mySerial.available())
-    Serial.write(mySerial.read());
-  if (Serial.available())
-    mySerial.write(Serial.read());
+
+  mySerial.print(counter);
+  mySerial.print("\r\n");
+  counter += 1;
+
+  //delay(1);
+  
+//  if (mySerial.available())
+//    Serial.write(mySerial.read());
+//  if (Serial.available())
+//    mySerial.write(Serial.read());
+
 }
