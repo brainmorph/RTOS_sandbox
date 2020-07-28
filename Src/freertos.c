@@ -25,7 +25,8 @@
 #include "cmsis_os.h"
 
 /* Private includes ----------------------------------------------------------*/
-/* USER CODE BEGIN Includes */     
+/* USER CODE BEGIN Includes */
+#include "usart.h"
 
 /* USER CODE END Includes */
 
@@ -151,6 +152,33 @@ void StartReadUARTTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	volatile uint8_t uartReceivedData[1] = {0};
+
+	volatile HAL_StatusTypeDef status = HAL_UART_Receive(&huart6, (uint8_t *)uartReceivedData,
+    		sizeof(uartReceivedData), 1000); // 10 ms timeout
+
+	if(status != HAL_OK)
+    {
+    	continue; // ignore packets that time out
+    }
+
+    static unsigned int lastReceivedCount = 0;
+    if(uartReceivedData[0] == (lastReceivedCount + 1))
+    {
+    	// yay we're not dropping anything
+
+    }
+    else
+    {
+    	// we're dropping packets
+    	static unsigned int droppedPackets = 0;
+    	unsigned int expectedCount = lastReceivedCount + 1;
+    	droppedPackets += uartReceivedData[0] - expectedCount;
+    }
+
+    lastReceivedCount = uartReceivedData[0];
+
+
     osDelay(1);
   }
   /* USER CODE END StartReadUARTTask */
