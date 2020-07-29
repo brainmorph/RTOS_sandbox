@@ -18,13 +18,18 @@ void setup() {
   mySerial.println("Hello, world?");
 }
 
-byte counter = 0;
+unsigned int counter = 245;
 void loop() {
   // put your main code here, to run repeatedly:
 
   /* Send to STM32 */
   //mySerial.print(counter);
-  mySerial.write(counter);
+  
+  byte numWritten = mySerial.write(counter);  // send low byte
+  Serial.println(numWritten);
+  numWritten = Serial.write(counter);
+  Serial.println(numWritten);
+  //mySerial.write(counter >> 8);    // send high byte
     
   /* Send to Arduino serial monitor */
   Serial.print(counter);
@@ -32,7 +37,7 @@ void loop() {
   
   counter += 1;
 
-  delay(5000);
+  delay(1500);
   
 //  if (mySerial.available())
 //    Serial.write(mySerial.read());

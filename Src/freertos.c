@@ -152,15 +152,18 @@ void StartReadUARTTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
-	volatile uint8_t uartReceivedData[1] = {0};
+	volatile uint8_t uartReceivedData[2] = {0};
 
 	volatile HAL_StatusTypeDef status = HAL_UART_Receive(&huart6, (uint8_t *)uartReceivedData,
-    		sizeof(uartReceivedData), 1000); // 10 ms timeout
+    		sizeof(uartReceivedData), 2000); // 10 ms timeout
 
 	if(status != HAL_OK)
     {
     	continue; // ignore packets that time out
     }
+
+	volatile uint16_t data = (uartReceivedData[0] << 8) | uartReceivedData[1];
+	data = data;
 
     static unsigned int lastReceivedCount = 0;
     if(uartReceivedData[0] == (lastReceivedCount + 1))
