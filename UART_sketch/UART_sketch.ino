@@ -24,6 +24,12 @@ void loop() {
 
   /* Send to STM32 */
   //mySerial.print(counter);
+
+  /* !!NOTE!! : The documentation on Serial.write(var) function makes it seem like if var is bigger than 1 byte 
+   *  that the system will serialize the bytes and send them out sequentially.  This is NOT AT ALL what happens.
+   *  Thorough reading the documentation reveals that this only happens for "string" type objects.  That being said,
+   *  we need to send out 1 byte at a time (lower bits and higher bits) if 'var' is larger than 1 byte data type.
+   */
   
   byte numWritten = mySerial.write(counter);  // send low byte
   Serial.println(numWritten);
