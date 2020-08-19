@@ -157,7 +157,9 @@ void StartReadUARTTask(void *argument)
 	volatile uint8_t uartReceivedData[2] = {0};
 
 	volatile HAL_StatusTypeDef status = HAL_UART_Receive(&huart6, (uint8_t *)uartReceivedData,
-    		sizeof(uartReceivedData), 2000); // 10 ms timeout
+    		sizeof(uartReceivedData), 1000);
+
+	HAL_UART_Receive(&huart6, NULL, 1, 1); // throw away extra byte that might have accumulated
 
 	if(status != HAL_OK)
     {
