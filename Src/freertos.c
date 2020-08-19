@@ -27,6 +27,8 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */     
 #include "usart.h"
+#include <stdio.h>
+#include <string.h>
 
 /* USER CODE END Includes */
 
@@ -130,7 +132,7 @@ void StartBlinkTestTask(void *argument)
   for(;;)
   {
     HAL_GPIO_TogglePin(BLINK_LED_GPIO_Port, BLINK_LED_Pin);
-    osDelay(500);
+    osDelay(2000);
   }
 
   // This should never be reached but just in case
@@ -165,21 +167,17 @@ void StartReadUARTTask(void *argument)
 	volatile uint16_t data = (uartReceivedData[0] << 8) | uartReceivedData[1];
 	data = data;
 
-    static unsigned int lastReceivedCount = 0;
-    if(uartReceivedData[0] == (lastReceivedCount + 1))
-    {
-    	// yay we're not dropping anything
 
-    }
-    else
-    {
-    	// we're dropping packets
-    	static unsigned int droppedPackets = 0;
-    	unsigned int expectedCount = lastReceivedCount + 1;
-    	droppedPackets += uartReceivedData[0] - expectedCount;
-    }
+	//continue;
 
-    lastReceivedCount = uartReceivedData[0];
+
+	/* Send received data back out to UART */
+	char txBuf[50];
+	snprintf(txBuf, sizeof(txBuf), "%u\r\n", data);
+	volatile int length = strlen(txBuf);
+	length = length;
+
+	HAL_UART_Transmit(&huart6, (uint8_t*)txBuf, strlen(txBuf), 10);
 
 
     osDelay(1);
