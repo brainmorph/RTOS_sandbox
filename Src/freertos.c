@@ -104,7 +104,7 @@ osKernelInitialize();
   const osThreadAttr_t readUART_attributes = {
     .name = "readUART",
     .priority = (osPriority_t) osPriorityBelowNormal,
-    .stack_size = 128
+    .stack_size = 512
   };
   readUARTHandle = osThreadNew(StartReadUARTTask, NULL, &readUART_attributes);
 
@@ -132,7 +132,7 @@ void StartBlinkTestTask(void *argument)
   for(;;)
   {
     HAL_GPIO_TogglePin(BLINK_LED_GPIO_Port, BLINK_LED_Pin);
-    osDelay(2000);
+    osDelay(200);
   }
 
   // This should never be reached but just in case
