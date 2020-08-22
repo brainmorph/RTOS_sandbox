@@ -29,6 +29,7 @@
 #include "usart.h"
 #include <stdio.h>
 #include <string.h>
+#include "queue.h"
 
 /* USER CODE END Includes */
 
@@ -49,6 +50,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
+QueueHandle_t uartQueue;
 
 /* USER CODE END Variables */
 osThreadId_t blinkTestHandle;
@@ -162,6 +164,10 @@ void StartBlinkTestTask(void *argument)
 void StartReadUARTTask(void *argument)
 {
   /* USER CODE BEGIN StartReadUARTTask */
+
+  /* Setup UART queue */
+  uartQueue = xQueueCreate( 100, sizeof(uint16_t));
+
   /* Infinite loop */
   for(;;)
   {
@@ -177,20 +183,18 @@ void StartReadUARTTask(void *argument)
     	continue; // ignore packets that time out
     }
 
-	volatile uint16_t data = (uartReceivedData[0] << 8) | uartReceivedData[1];
+	uint16_t data = (uartReceivedData[0] << 8) | uartReceivedData[1];
 	data = data;
 
 
 	//continue;
 
 
-	/* Send received data back out to UART */
-	char txBuf[50];
-	snprintf(txBuf, sizeof(txBuf), "%u\r\n", data);
-	volatile int length = strlen(txBuf);
-	length = length;
-
-	HAL_UART_Transmit(&huart6, (uint8_t*)txBuf, strlen(txBuf), 10);
+	/* Send received data to UART queue */
+	if(xQueueSend(uartQueue, &data, (TickType_t) 10) != pdPASS)
+	{
+		/* Failed to send to queue */
+	}
 
 
     osDelay(1);
@@ -211,6 +215,24 @@ void StartSendUARTTask(void *argument)
   /* Infinite loop */
   for(;;)
   {
+	  /* If data exists in UART queue, retrieve it */
+	  if(uartQueue != NULL)
+	  {
+		  uint16_t data;
+		  xQueueReceive(uartQueue, &data, (TickType_t) 10);
+
+		  /* Send received data back out to UART */
+		  char txBuf[50];
+		  snprintf(txBuf, sizeof(txBuf), "%u\r\n", data);
+		  volatile int length = strlen(txBuf);
+		  length = length;
+
+		  HAL_UART_Transmit(&huart6, (uint8_t*)txBuf, strlen(txBuf), 10);
+
+	  }
+
+
+
     osDelay(1);
   }
   /* USER CODE END StartSendUARTTask */
