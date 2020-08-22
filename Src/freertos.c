@@ -53,6 +53,7 @@
 /* USER CODE END Variables */
 osThreadId_t blinkTestHandle;
 osThreadId_t readUARTHandle;
+osThreadId_t sendUARTHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -61,6 +62,7 @@ osThreadId_t readUARTHandle;
 
 void StartBlinkTestTask(void *argument);
 void StartReadUARTTask(void *argument);
+void StartSendUARTTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -108,6 +110,14 @@ osKernelInitialize();
   };
   readUARTHandle = osThreadNew(StartReadUARTTask, NULL, &readUART_attributes);
 
+  /* definition and creation of sendUART */
+  const osThreadAttr_t sendUART_attributes = {
+    .name = "sendUART",
+    .priority = (osPriority_t) osPriorityBelowNormal1,
+    .stack_size = 512
+  };
+  sendUARTHandle = osThreadNew(StartSendUARTTask, NULL, &sendUART_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -123,6 +133,7 @@ osKernelInitialize();
 /* USER CODE END Header_StartBlinkTestTask */
 void StartBlinkTestTask(void *argument)
 {
+    
     
     
     
@@ -185,6 +196,24 @@ void StartReadUARTTask(void *argument)
     osDelay(1);
   }
   /* USER CODE END StartReadUARTTask */
+}
+
+/* USER CODE BEGIN Header_StartSendUARTTask */
+/**
+* @brief Function implementing the sendUART thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartSendUARTTask */
+void StartSendUARTTask(void *argument)
+{
+  /* USER CODE BEGIN StartSendUARTTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartSendUARTTask */
 }
 
 /* Private application code --------------------------------------------------*/
