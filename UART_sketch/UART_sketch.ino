@@ -45,7 +45,7 @@ void loop() {
   
   counter += 1;
 
-  delay(20);
+  delay(3);
   
 //  if (mySerial.available())
 //    Serial.write(mySerial.read());
