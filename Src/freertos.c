@@ -218,16 +218,34 @@ void StartSendUARTTask(void *argument)
 	  /* If data exists in UART queue, retrieve it */
 	  if(uartQueue != NULL)
 	  {
-		  uint16_t data;
-		  xQueueReceive(uartQueue, &data, (TickType_t) 10);
-
-		  /* Send received data back out to UART */
 		  char txBuf[50];
-		  snprintf(txBuf, sizeof(txBuf), "%u\r\n", data);
-		  volatile int length = strlen(txBuf);
-		  length = length;
 
-		  HAL_UART_Transmit(&huart6, (uint8_t*)txBuf, strlen(txBuf), 10);
+
+		  /* Print out how many elements are waiting in queue */
+		  UBaseType_t elems = uxQueueMessagesWaiting(uartQueue);
+		  osDelay(1); // !! TOTALLY NECESSARY WHEN CHECKING MESSAGES WAITING.  I don't understand why.
+
+		  if(elems > 55)
+		  {
+			  snprintf(txBuf, sizeof(txBuf), "Elems: %lu\r\n", elems);
+			  HAL_UART_Transmit(&huart6, (uint8_t*)txBuf, strlen(txBuf), 10);
+		  }
+		  if(elems > 0)
+		  {
+			  /* Grab data from queue */
+			  uint16_t data = 99;
+			  xQueueReceive(uartQueue, &data, (TickType_t) 10);
+
+			  /* Send received data back out to UART */
+			  snprintf(txBuf, sizeof(txBuf), "%u\r\n", data);
+			  volatile int length = strlen(txBuf);
+			  length = length;
+
+			  HAL_UART_Transmit(&huart6, (uint8_t*)txBuf, strlen(txBuf), 10);
+		  }
+
+
+
 
 	  }
 
