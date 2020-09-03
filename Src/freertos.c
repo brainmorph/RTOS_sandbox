@@ -30,6 +30,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "queue.h"
+#include "mpu6050.h"
 
 /* USER CODE END Includes */
 
