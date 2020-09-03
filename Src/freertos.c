@@ -57,6 +57,7 @@ QueueHandle_t uartQueue;
 osThreadId_t blinkTestHandle;
 osThreadId_t readUARTHandle;
 osThreadId_t sendUARTHandle;
+osThreadId_t readMPUHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -66,6 +67,7 @@ osThreadId_t sendUARTHandle;
 void StartBlinkTestTask(void *argument);
 void StartReadUARTTask(void *argument);
 void StartSendUARTTask(void *argument);
+void StartReadMPU(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -121,6 +123,14 @@ osKernelInitialize();
   };
   sendUARTHandle = osThreadNew(StartSendUARTTask, NULL, &sendUART_attributes);
 
+  /* definition and creation of readMPU */
+  const osThreadAttr_t readMPU_attributes = {
+    .name = "readMPU",
+    .priority = (osPriority_t) osPriorityBelowNormal,
+    .stack_size = 512
+  };
+  readMPUHandle = osThreadNew(StartReadMPU, NULL, &readMPU_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -136,6 +146,7 @@ osKernelInitialize();
 /* USER CODE END Header_StartBlinkTestTask */
 void StartBlinkTestTask(void *argument)
 {
+    
     
     
     
@@ -243,6 +254,24 @@ void StartSendUARTTask(void *argument)
     osDelay(1);
   }
   /* USER CODE END StartSendUARTTask */
+}
+
+/* USER CODE BEGIN Header_StartReadMPU */
+/**
+* @brief Function implementing the readMPU thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartReadMPU */
+void StartReadMPU(void *argument)
+{
+  /* USER CODE BEGIN StartReadMPU */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartReadMPU */
 }
 
 /* Private application code --------------------------------------------------*/
