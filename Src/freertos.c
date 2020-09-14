@@ -266,9 +266,19 @@ void StartSendUARTTask(void *argument)
 void StartReadMPU(void *argument)
 {
   /* USER CODE BEGIN StartReadMPU */
+
+  InitMPU();
+
   /* Infinite loop */
   for(;;)
   {
+	float x,y,z;
+
+	ReadAcceleration(&x, &y, &z);
+	x = x;
+	y = y;
+	z = z;
+
     osDelay(1);
   }
   /* USER CODE END StartReadMPU */
