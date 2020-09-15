@@ -8,6 +8,7 @@
 #include "mpu6050.h"
 #include "i2c.h"
 #include "logging.h"
+#include "assert.h"
 
 /* Static Function Declarations */
 static uint8_t readMPUreg(uint8_t reg);
@@ -16,24 +17,32 @@ static void writeMPUreg(uint8_t reg, uint8_t value);
 //static void configMPUFilter();
 
 
+#define WHO_AM_I 0x75
+#define WHO_AM_I_RETURN_VAL 0x68
+#define PWR_MGMT_1 0x6B
+#define ACCEL_CONFIG 0x1C
+#define GYRO_CONFIG 0x1B
+
 void InitMPU(void)
 {
 	volatile uint8_t value = 0;
 
 	//read a register over I2C
-	value = readMPUreg(0x75);
+	value = readMPUreg(WHO_AM_I);
+	assert(value == WHO_AM_I_RETURN_VAL); // suspend operation if not true; there's a major issue and there's no point continuing
+
 	value = readMPUreg(0x6B);
-	writeMPUreg(0x6B, 0x00); // wake the IMU
-	readMPUreg(0x6B);
-	readMPUreg(0x6B);
+	writeMPUreg(PWR_MGMT_1, 0x00); // wake the IMU
+	readMPUreg(PWR_MGMT_1);
+	readMPUreg(PWR_MGMT_1);
 
-	readMPUreg(0x1C); // read accel config register
-	writeMPUreg(0x1C, 0x10); // configure fullscale for +-8 g
-	value = readMPUreg(0x1C); // confirm
+	readMPUreg(ACCEL_CONFIG); // read accel config register
+	writeMPUreg(ACCEL_CONFIG, 0x10); // configure fullscale for +-8 g
+	value = readMPUreg(ACCEL_CONFIG); // confirm
 
-	readMPUreg(0x1B); // read gyro config register
-	writeMPUreg(0x1B, 0x08); // configure fullscale for +- 500 degress/s
-	value = readMPUreg(0x1B); // confirm
+	readMPUreg(GYRO_CONFIG); // read gyro config register
+	writeMPUreg(GYRO_CONFIG, 0x08); // configure fullscale for +- 500 degress/s
+	value = readMPUreg(GYRO_CONFIG); // confirm
 
 	value = value;
 
@@ -53,7 +62,7 @@ static uint8_t readMPUreg(uint8_t reg)
 	uint16_t shiftedAddress = deviceAddress << 1;
 	uint8_t pData[100];
 	pData[0] = reg; //register in question
-	HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c3, shiftedAddress, pData, 1, 1000); //select register
+	HAL_StatusTypeDef status = HAL_I2C_Master_Transmit(&hi2c3, shiftedAddress, pData, 1, 1000); //select MPU register
 	if(status != HAL_OK)
 	{
 		// TODO: log error
@@ -61,7 +70,7 @@ static uint8_t readMPUreg(uint8_t reg)
 	}
 
 	uint8_t value = 0;
-	status = HAL_I2C_Master_Receive(&hi2c3, shiftedAddress, &value, 1, 1000); //read from register
+	status = HAL_I2C_Master_Receive(&hi2c3, shiftedAddress, &value, 1, 1000); //read from MPU register
 	return value;
 }
 
