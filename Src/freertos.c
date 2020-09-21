@@ -150,7 +150,6 @@ void StartBlinkTestTask(void *argument)
     
     
     
-    
 
   /* USER CODE BEGIN StartBlinkTestTask */
   /* Infinite loop */
@@ -266,18 +265,31 @@ void StartSendUARTTask(void *argument)
 void StartReadMPU(void *argument)
 {
   /* USER CODE BEGIN StartReadMPU */
-
+  osDelay(1000);
+  taskENTER_CRITICAL();
   InitMPU();
+  osDelay(10);
 
-  /* Infinite loop */
-  for(;;)
-  {
 	float x,y,z;
 
 	ReadAcceleration(&x, &y, &z);
 	x = x;
 	y = y;
 	z = z;
+	taskEXIT_CRITICAL();
+
+  /* Infinite loop */
+  for(;;)
+  {
+	float x,y,z;
+
+	taskENTER_CRITICAL();
+	ReadAcceleration(&x, &y, &z);
+	taskEXIT_CRITICAL();
+	x = x;
+	y = y;
+	z = z;
+
 
     osDelay(1);
   }

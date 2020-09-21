@@ -17,11 +17,24 @@ static void writeMPUreg(uint8_t reg, uint8_t value);
 //static void configMPUFilter();
 
 
+
+#ifdef MPU6050
 #define WHO_AM_I 0x75
 #define WHO_AM_I_RETURN_VAL 0x68
 #define PWR_MGMT_1 0x6B
 #define ACCEL_CONFIG 0x1C
 #define GYRO_CONFIG 0x1B
+#endif
+
+#define MPU9250
+#ifdef MPU9250
+#define WHO_AM_I 0x75
+#define WHO_AM_I_RETURN_VAL 0x71
+#define PWR_MGMT_1 0x6B
+#define PWR_MGMT_2 0x6C
+#define ACCEL_CONFIG 0x1C
+#define GYRO_CONFIG 0x1B
+#endif
 
 void InitMPU(void)
 {
@@ -34,7 +47,10 @@ void InitMPU(void)
 	value = readMPUreg(0x6B);
 	writeMPUreg(PWR_MGMT_1, 0x00); // wake the IMU
 	readMPUreg(PWR_MGMT_1);
-	readMPUreg(PWR_MGMT_1);
+
+	value = readMPUreg(PWR_MGMT_2);
+	writeMPUreg(PWR_MGMT_2, 0x00); // enable all sensors
+	readMPUreg(PWR_MGMT_2);
 
 	readMPUreg(ACCEL_CONFIG); // read accel config register
 	writeMPUreg(ACCEL_CONFIG, 0x10); // configure fullscale for +-8 g
@@ -151,8 +167,21 @@ void ReadAcceleration(float* floatX, float* floatY, float* floatZ)
 
 	volatile int16_t temp = (data[6] << 8) | data[7];
 
-	volatile float temperature = ((float)temp / 340.0) + 36.53;
+	volatile float temperature = ((float)temp / 340.0) + 36.53; // straight from MPU6050 datasheet. No explanation given why these numbers
 	temperature = temperature;
+
+
+	volatile uint8_t temp1 = readMPUreg(0x41);
+	volatile uint8_t temp2 = readMPUreg(0x42);
+	volatile int16_t temp3 = (temp1 << 8) | temp2;
+
+
+	/* Temperature calculation for 9250 taken from
+	 * https://github.com/bolderflight/MPU9250/blob/master/src/MPU9250.cpp
+	 */
+    const float _tempScale = 333.87f;
+    const float _tempOffset = 21.0f;
+	temperature2 = (((float)temp3 - _tempOffset) / _tempScale) + _tempOffset;
 
 
 	*floatX = (float)aX * (8.0/32767.0); // FS=+-8g
