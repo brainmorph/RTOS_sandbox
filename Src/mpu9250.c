@@ -1,11 +1,11 @@
 /*
- * mpu6050.c
+ * mpu9250.c
  *
  *  Created on: Jun 16, 2020
  *      Author: DC
  */
 
-#include "mpu6050.h"
+#include "mpu9250.h"
 #include "i2c.h"
 #include "logging.h"
 #include "assert.h"
@@ -18,13 +18,13 @@ static void writeMPUreg(uint8_t reg, uint8_t value);
 
 /* 6050 Registers */
 #define WHO_AM_I 0x75
-#define WHO_AM_I_RETURN_VAL 0x68
+#define WHO_AM_I_RETURN_VAL 0x71
 #define PWR_MGMT_1 0x6B
+#define PWR_MGMT_2 0x6C
 #define ACCEL_CONFIG 0x1C
 #define GYRO_CONFIG 0x1B
 
-
-void InitMPU6050(void)
+void InitMPU9250(void)
 {
 	volatile uint8_t value = 0;
 
@@ -35,6 +35,10 @@ void InitMPU6050(void)
 	value = readMPUreg(0x6B);
 	writeMPUreg(PWR_MGMT_1, 0x00); // wake the IMU
 	readMPUreg(PWR_MGMT_1);
+
+	value = readMPUreg(PWR_MGMT_2);
+	writeMPUreg(PWR_MGMT_2, 0x00); // enable all sensors
+	readMPUreg(PWR_MGMT_2);
 
 	readMPUreg(ACCEL_CONFIG); // read accel config register
 	writeMPUreg(ACCEL_CONFIG, 0x10); // configure fullscale for +-8 g
@@ -136,7 +140,7 @@ static void writeMPUreg(uint8_t reg, uint8_t value) // TODO: move to separate mo
 //	test = test;
 //}
 
-void ReadAcceleration6050(float* floatX, float* floatY, float* floatZ)
+void ReadAcceleration9250(float* floatX, float* floatY, float* floatZ)
 {
 	volatile uint8_t test1 = readMPUreg(0x1C);
 	test1 = test1;
@@ -151,7 +155,13 @@ void ReadAcceleration6050(float* floatX, float* floatY, float* floatZ)
 
 	volatile int16_t temp = (data[6] << 8) | data[7];
 
-	volatile float temperature = ((float)temp / 340.0) + 36.53; // straight from MPU6050 datasheet. No explanation given why these numbers
+
+	/* Temperature calculation for 9250 taken from
+	 * https://github.com/bolderflight/MPU9250/blob/master/src/MPU9250.cpp
+	 */
+    const float _tempScale = 333.87f;
+    const float _tempOffset = 21.0f;
+	volatile float temperature = (((float)temp - _tempOffset) / _tempScale) + _tempOffset;
 	temperature = temperature;
 
 
@@ -167,7 +177,7 @@ void ReadAcceleration6050(float* floatX, float* floatY, float* floatZ)
 
 
 
-void ReadGyro6050(float* floatX, float* floatY, float* floatZ)
+void ReadGyro9250(float* floatX, float* floatY, float* floatZ)
 {
 	// Read x,y,z all gyro in one go to guarantee they're from same sample
 	uint8_t data[10] = {0};

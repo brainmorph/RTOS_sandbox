@@ -30,7 +30,8 @@
 #include <stdio.h>
 #include <string.h>
 #include "queue.h"
-#include "mpu6050.h"
+#include "mpu_sensor.h"
+//#include "mpu6050.h"
 
 /* USER CODE END Includes */
 
@@ -265,30 +266,35 @@ void StartSendUARTTask(void *argument)
 void StartReadMPU(void *argument)
 {
   /* USER CODE BEGIN StartReadMPU */
-  osDelay(1000);
+  osDelay(1000); // Give sensor time to power up
   taskENTER_CRITICAL();
   InitMPU();
   osDelay(10);
 
-	float x,y,z;
-
-	ReadAcceleration(&x, &y, &z);
-	x = x;
-	y = y;
-	z = z;
+//	float x,y,z;
+//
+//	ReadAcceleration(&x, &y, &z);
+//	x = x;
+//	y = y;
+//	z = z;
 	taskEXIT_CRITICAL();
 
   /* Infinite loop */
   for(;;)
   {
-	float x,y,z;
+	float ax,ay,az,gx,gy,gz;
 
 	taskENTER_CRITICAL();
-	ReadAcceleration(&x, &y, &z);
+	ReadAcceleration(&ax, &ay, &az);
+	ReadGyro(&gx, &gy, &gz);
 	taskEXIT_CRITICAL();
-	x = x;
-	y = y;
-	z = z;
+	ax = ax;
+	ay = ay;
+	az = az;
+
+	gx = gx;
+	gy = gy;
+	gz = gz;
 
 
     osDelay(1);

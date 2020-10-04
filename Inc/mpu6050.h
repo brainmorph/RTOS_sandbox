@@ -10,9 +10,9 @@
 
 #include <stdint.h>
 
-void ReadAcceleration(float* floatX, float* floatY, float* floatZ);
-void ReadGyro(float* floatX, float* floatY, float* floatZ);
+void ReadAcceleration6050(float* floatX, float* floatY, float* floatZ);
+void ReadGyro6050(float* floatX, float* floatY, float* floatZ);
 
-void InitMPU(void);
+void InitMPU6050(void);
 
 #endif /* MPU6050_H */
