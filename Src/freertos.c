@@ -151,6 +151,7 @@ void StartBlinkTestTask(void *argument)
     
     
     
+    
 
   /* USER CODE BEGIN StartBlinkTestTask */
   /* Infinite loop */
@@ -265,6 +266,9 @@ void StartSendUARTTask(void *argument)
 /* USER CODE END Header_StartReadMPU */
 void StartReadMPU(void *argument)
 {
+	uint8_t buf[20] = "Test\r\n";
+    HAL_UART_Transmit(&huart1, buf, sizeof(buf), 1);
+
   /* USER CODE BEGIN StartReadMPU */
   osDelay(1000); // Give sensor time to power up
   taskENTER_CRITICAL();
@@ -284,9 +288,11 @@ void StartReadMPU(void *argument)
   {
 	float ax,ay,az,gx,gy,gz;
 
+	HAL_UART_Transmit(&huart1, buf, sizeof(buf), 1);
+
 	taskENTER_CRITICAL();
 	ReadAcceleration(&ax, &ay, &az);
-	ReadGyro(&gx, &gy, &gz);
+	//ReadGyro(&gx, &gy, &gz);
 	taskEXIT_CRITICAL();
 	ax = ax;
 	ay = ay;
