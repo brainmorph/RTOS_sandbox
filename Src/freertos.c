@@ -266,8 +266,6 @@ void StartSendUARTTask(void *argument)
 /* USER CODE END Header_StartReadMPU */
 void StartReadMPU(void *argument)
 {
-	uint8_t buf[20] = "Test\r\n";
-    HAL_UART_Transmit(&huart1, buf, sizeof(buf), 1);
 
   /* USER CODE BEGIN StartReadMPU */
   osDelay(1000); // Give sensor time to power up
@@ -288,7 +286,59 @@ void StartReadMPU(void *argument)
   {
 	float ax,ay,az,gx,gy,gz;
 
-	HAL_UART_Transmit(&huart1, buf, sizeof(buf), 1);
+
+
+
+	char buf[50];
+
+	// Send character to clear Tera Term screen
+	snprintf(buf, sizeof(buf), "\x1b[2J");
+	taskENTER_CRITICAL();
+	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
+	taskEXIT_CRITICAL();
+
+//	snprintf(buf, sizeof(buf), "asdfjkl; \n\r zxy \n\r");
+//	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
+
+	snprintf(buf, sizeof(buf), "\r\n      /---------9");
+	taskENTER_CRITICAL();
+	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
+	taskEXIT_CRITICAL();
+
+	snprintf(buf, sizeof(buf), "\r\n     /----------9");
+	taskENTER_CRITICAL();
+	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
+	taskEXIT_CRITICAL();
+
+	snprintf(buf, sizeof(buf), "\r\n    /-----------9");
+	taskENTER_CRITICAL();
+	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
+	taskEXIT_CRITICAL();
+
+	snprintf(buf, sizeof(buf), "\r\n   /------------9");
+	taskENTER_CRITICAL();
+	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
+	taskEXIT_CRITICAL();
+
+	snprintf(buf, sizeof(buf), "\r\n  /-------------9");
+	taskENTER_CRITICAL();
+	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
+	taskEXIT_CRITICAL();
+
+	snprintf(buf, sizeof(buf), "\r\n /--------------9");
+	taskENTER_CRITICAL();
+	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
+	taskEXIT_CRITICAL();
+
+	snprintf(buf, sizeof(buf), "\r\n/---------------9");
+	taskENTER_CRITICAL();
+	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
+	taskEXIT_CRITICAL();
+
+	snprintf(buf, sizeof(buf), "\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
+	taskENTER_CRITICAL();
+	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
+	taskEXIT_CRITICAL();
 
 	taskENTER_CRITICAL();
 	ReadAcceleration(&ax, &ay, &az);
@@ -303,7 +353,7 @@ void StartReadMPU(void *argument)
 	gz = gz;
 
 
-    osDelay(1);
+    osDelay(1000);
   }
   /* USER CODE END StartReadMPU */
 }
