@@ -8,8 +8,8 @@
 #include "mpu_sensor.h"
 
 /* !!! --- Select the appropriate MPU --- !!! */
-//#define MPU6050
-#define MPU9250
+#define MPU6050
+//#define MPU9250
 
 
 #ifdef MPU6050

@@ -37,6 +37,7 @@
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
+#define GLOBAL_VER 0.0.1;
 
 /* USER CODE END PD */
 
