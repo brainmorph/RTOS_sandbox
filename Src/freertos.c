@@ -288,6 +288,9 @@ void StartReadMPU(void *argument)
 
 
 
+	//vTaskSuspendAll();
+
+
 
 	char buf[50];
 
@@ -296,6 +299,7 @@ void StartReadMPU(void *argument)
 	taskENTER_CRITICAL();
 	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
 	taskEXIT_CRITICAL();
+	osDelay(1);
 
 //	snprintf(buf, sizeof(buf), "asdfjkl; \n\r zxy \n\r");
 //	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
@@ -304,41 +308,47 @@ void StartReadMPU(void *argument)
 	taskENTER_CRITICAL();
 	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
 	taskEXIT_CRITICAL();
+	osDelay(1);
 
 	snprintf(buf, sizeof(buf), "\r\n     /----------9");
 	taskENTER_CRITICAL();
 	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
 	taskEXIT_CRITICAL();
+	osDelay(1);
 
 	snprintf(buf, sizeof(buf), "\r\n    /-----------9");
 	taskENTER_CRITICAL();
 	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
 	taskEXIT_CRITICAL();
+	osDelay(1);
 
 	snprintf(buf, sizeof(buf), "\r\n   /------------9");
 	taskENTER_CRITICAL();
 	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
 	taskEXIT_CRITICAL();
+	osDelay(1);
 
 	snprintf(buf, sizeof(buf), "\r\n  /-------------9");
 	taskENTER_CRITICAL();
 	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
 	taskEXIT_CRITICAL();
+	osDelay(1);
 
 	snprintf(buf, sizeof(buf), "\r\n /--------------9");
 	taskENTER_CRITICAL();
 	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
 	taskEXIT_CRITICAL();
+	osDelay(1);
 
 	snprintf(buf, sizeof(buf), "\r\n/---------------9");
 	taskENTER_CRITICAL();
 	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
 	taskEXIT_CRITICAL();
+	osDelay(1);
 
-	snprintf(buf, sizeof(buf), "\r\n\r\n\r\n\r\n\r\n\r\n\r\n\r\n");
-	taskENTER_CRITICAL();
-	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
-	taskEXIT_CRITICAL();
+
+	//xTaskResumeAll();
+
 
 	taskENTER_CRITICAL();
 	ReadAcceleration(&ax, &ay, &az);
@@ -353,7 +363,7 @@ void StartReadMPU(void *argument)
 	gz = gz;
 
 
-    osDelay(1000);
+    osDelay(100);
   }
   /* USER CODE END StartReadMPU */
 }
