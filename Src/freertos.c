@@ -37,6 +37,16 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+typedef struct
+{
+	float ax;
+	float ay;
+	float az;
+
+	float gx;
+	float gy;
+	float gz;
+}MpuState;
 
 /* USER CODE END PTD */
 
@@ -53,6 +63,7 @@
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN Variables */
 QueueHandle_t uartQueue;
+QueueHandle_t mpuQueue;
 
 /* USER CODE END Variables */
 osThreadId_t blinkTestHandle;
@@ -79,6 +90,9 @@ void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
   */
 void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
+	  /* Setup UART queue */
+    uartQueue = xQueueCreate(100, sizeof(uint16_t));
+    mpuQueue = xQueueCreate(100, sizeof(MpuState)); // create space for 100 values (each one is 16 bit)
        
   /* USER CODE END Init */
 osKernelInitialize();
@@ -178,8 +192,7 @@ void StartReadUARTTask(void *argument)
 {
   /* USER CODE BEGIN StartReadUARTTask */
 
-  /* Setup UART queue */
-  uartQueue = xQueueCreate( 100, sizeof(uint16_t));
+
 
   /* Infinite loop */
   for(;;)
@@ -268,23 +281,16 @@ void StartReadMPU(void *argument)
 {
 
   /* USER CODE BEGIN StartReadMPU */
-  osDelay(1000); // Give sensor time to power up
-  taskENTER_CRITICAL();
-  InitMPU();
-  osDelay(10);
-
-//	float x,y,z;
-//
-//	ReadAcceleration(&x, &y, &z);
-//	x = x;
-//	y = y;
-//	z = z;
+    osDelay(1000); // Give sensor time to power up
+    taskENTER_CRITICAL();
+    InitMPU();
+    osDelay(10);
 	taskEXIT_CRITICAL();
 
-  /* Infinite loop */
-  for(;;)
-  {
-	float ax,ay,az,gx,gy,gz;
+    /* Infinite loop */
+    for(;;)
+    {
+        float ax,ay,az,gx,gy,gz;
 
 
 
@@ -352,7 +358,7 @@ void StartReadMPU(void *argument)
 
 	taskENTER_CRITICAL();
 	ReadAcceleration(&ax, &ay, &az);
-	//ReadGyro(&gx, &gy, &gz);
+	ReadGyro(&gx, &gy, &gz);
 	taskEXIT_CRITICAL();
 	ax = ax;
 	ay = ay;
@@ -361,6 +367,15 @@ void StartReadMPU(void *argument)
 	gx = gx;
 	gy = gy;
 	gz = gz;
+
+	MpuState mpu = {ax, ay, az, gx, gy, gz};
+
+	//TODO: put values in Queue
+	/* Send received data to UART queue */
+	if(xQueueSend(uartQueue, &mpu, (TickType_t) 10) != pdPASS)
+	{
+		/* Failed to send to queue */
+	}
 
 
     osDelay(100);
