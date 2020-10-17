@@ -59,6 +59,8 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define SPI1_CS_Pin GPIO_PIN_7
+#define SPI1_CS_GPIO_Port GPIOB
 #define BLINK_LED_Pin GPIO_PIN_1
 #define BLINK_LED_GPIO_Port GPIOE
 /* USER CODE BEGIN Private defines */

@@ -287,7 +287,6 @@ void StartSendUARTTask(void *argument)
 /* USER CODE END Header_StartReadMPU */
 void StartReadMPU(void *argument)
 {
-
   /* USER CODE BEGIN StartReadMPU */
     osDelay(1000); // Give sensor time to power up
     taskENTER_CRITICAL();
