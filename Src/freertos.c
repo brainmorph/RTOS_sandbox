@@ -46,7 +46,7 @@ typedef struct
 	float gx;
 	float gy;
 	float gz;
-}MpuState;
+}MpuState_t;
 
 /* USER CODE END PTD */
 
@@ -92,7 +92,7 @@ void MX_FREERTOS_Init(void) {
   /* USER CODE BEGIN Init */
 	  /* Setup UART queue */
     uartQueue = xQueueCreate(100, sizeof(uint16_t));
-    mpuQueue = xQueueCreate(100, sizeof(MpuState)); // create space for 100 values (each one is 16 bit)
+    mpuQueue = xQueueCreate(100, sizeof(MpuState_t)); // create space for 100 values (each one is 16 bit)
        
   /* USER CODE END Init */
 osKernelInitialize();
@@ -244,7 +244,7 @@ void StartSendUARTTask(void *argument)
 	  /* If data exists in UART queue, retrieve it */
 	  if(uartQueue != NULL)
 	  {
-		  char txBuf[50];
+		  char txBuf[100];
 
 		  /* Grab data from queue */
 		  uint16_t data = 99;
@@ -260,6 +260,14 @@ void StartSendUARTTask(void *argument)
 
 
 
+		  MpuState_t state;
+
+		  if(xQueueReceive(mpuQueue, &state, (TickType_t) 0))
+		  {
+			  snprintf(txBuf, sizeof(txBuf), "lol %d \r\n", (int)state.ax);
+
+			  HAL_UART_Transmit(&huart1, (uint8_t*)txBuf, strlen(txBuf), 10);
+		  }
 
 	  }
 
@@ -298,62 +306,17 @@ void StartReadMPU(void *argument)
 
 
 
-	char buf[50];
+//	char buf[50];
 
 	// Send character to clear Tera Term screen
-	snprintf(buf, sizeof(buf), "\x1b[2J");
-	taskENTER_CRITICAL();
-	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
-	taskEXIT_CRITICAL();
-	osDelay(1);
+//	snprintf(buf, sizeof(buf), "\x1b[2J");
+//	taskENTER_CRITICAL();
+//	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
+//	taskEXIT_CRITICAL();
+//	osDelay(1);
 
 //	snprintf(buf, sizeof(buf), "asdfjkl; \n\r zxy \n\r");
 //	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
-
-	snprintf(buf, sizeof(buf), "\r\n      /---------9");
-	taskENTER_CRITICAL();
-	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
-	taskEXIT_CRITICAL();
-	osDelay(1);
-
-	snprintf(buf, sizeof(buf), "\r\n     /----------9");
-	taskENTER_CRITICAL();
-	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
-	taskEXIT_CRITICAL();
-	osDelay(1);
-
-	snprintf(buf, sizeof(buf), "\r\n    /-----------9");
-	taskENTER_CRITICAL();
-	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
-	taskEXIT_CRITICAL();
-	osDelay(1);
-
-	snprintf(buf, sizeof(buf), "\r\n   /------------9");
-	taskENTER_CRITICAL();
-	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
-	taskEXIT_CRITICAL();
-	osDelay(1);
-
-	snprintf(buf, sizeof(buf), "\r\n  /-------------9");
-	taskENTER_CRITICAL();
-	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
-	taskEXIT_CRITICAL();
-	osDelay(1);
-
-	snprintf(buf, sizeof(buf), "\r\n /--------------9");
-	taskENTER_CRITICAL();
-	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
-	taskEXIT_CRITICAL();
-	osDelay(1);
-
-	snprintf(buf, sizeof(buf), "\r\n/---------------9");
-	taskENTER_CRITICAL();
-	HAL_UART_Transmit(&huart1, (uint8_t *)buf, strlen(buf), 1);
-	taskEXIT_CRITICAL();
-	osDelay(1);
-
-
-	//xTaskResumeAll();
 
 
 	taskENTER_CRITICAL();
@@ -368,14 +331,18 @@ void StartReadMPU(void *argument)
 	gy = gy;
 	gz = gz;
 
-	MpuState mpu = {ax, ay, az, gx, gy, gz};
+	MpuState_t mpu = {ax, ay, az, gx, gy, gz};
 
-	//TODO: put values in Queue
 	/* Send received data to UART queue */
-	if(xQueueSend(uartQueue, &mpu, (TickType_t) 10) != pdPASS)
+	if(xQueueSend(mpuQueue, &mpu, (TickType_t) 10) != pdPASS)
 	{
 		/* Failed to send to queue */
+		volatile int dummy2 = 0;
+		dummy2 = dummy2;
 	}
+
+	volatile int num = uxQueueMessagesWaiting(mpuQueue);
+	num = num;
 
 
     osDelay(100);
