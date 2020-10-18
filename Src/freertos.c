@@ -32,6 +32,7 @@
 #include "queue.h"
 #include "mpu_sensor.h"
 //#include "mpu6050.h"
+#include "spiLOG.h"
 
 /* USER CODE END Includes */
 
@@ -269,6 +270,13 @@ void StartSendUARTTask(void *argument)
 			  HAL_UART_Transmit(&huart1, (uint8_t*)txBuf, strlen(txBuf), 10);
 		  }
 
+
+		  /* Send test message to SPI */
+		  taskENTER_CRITICAL();
+		  uint8_t reg = 0x33;
+		  const uint8_t buf[10] = "Hello";
+		  SPI1_write_bytes(reg, buf, strlen((char *)buf));
+		  taskEXIT_CRITICAL();
 	  }
 
 
