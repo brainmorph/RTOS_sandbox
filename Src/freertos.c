@@ -71,6 +71,7 @@ osThreadId_t blinkTestHandle;
 osThreadId_t readUARTHandle;
 osThreadId_t sendUARTHandle;
 osThreadId_t readMPUHandle;
+osThreadId_t Task_ReadSensorHandle;
 
 /* Private function prototypes -----------------------------------------------*/
 /* USER CODE BEGIN FunctionPrototypes */
@@ -81,6 +82,7 @@ void StartBlinkTestTask(void *argument);
 void StartReadUARTTask(void *argument);
 void StartSendUARTTask(void *argument);
 void StartReadMPU(void *argument);
+void StartReadSensorTask(void *argument);
 
 void MX_FREERTOS_Init(void); /* (MISRA C 2004 rule 8.1) */
 
@@ -147,6 +149,14 @@ osKernelInitialize();
   };
   readMPUHandle = osThreadNew(StartReadMPU, NULL, &readMPU_attributes);
 
+  /* definition and creation of Task_ReadSensor */
+  const osThreadAttr_t Task_ReadSensor_attributes = {
+    .name = "Task_ReadSensor",
+    .priority = (osPriority_t) osPriorityNormal,
+    .stack_size = 1024
+  };
+  Task_ReadSensorHandle = osThreadNew(StartReadSensorTask, NULL, &Task_ReadSensor_attributes);
+
   /* USER CODE BEGIN RTOS_THREADS */
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
@@ -162,6 +172,7 @@ osKernelInitialize();
 /* USER CODE END Header_StartBlinkTestTask */
 void StartBlinkTestTask(void *argument)
 {
+    
     
     
     
@@ -355,6 +366,24 @@ void StartReadMPU(void *argument)
     osDelay(100);
   }
   /* USER CODE END StartReadMPU */
+}
+
+/* USER CODE BEGIN Header_StartReadSensorTask */
+/**
+* @brief Function implementing the Task_ReadSensor thread.
+* @param argument: Not used
+* @retval None
+*/
+/* USER CODE END Header_StartReadSensorTask */
+void StartReadSensorTask(void *argument)
+{
+  /* USER CODE BEGIN StartReadSensorTask */
+  /* Infinite loop */
+  for(;;)
+  {
+    osDelay(1);
+  }
+  /* USER CODE END StartReadSensorTask */
 }
 
 /* Private application code --------------------------------------------------*/
